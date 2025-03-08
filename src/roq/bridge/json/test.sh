@@ -27,7 +27,7 @@ else
   PREFIX=
 fi
 
-$PREFIX "./roq-client-bridge" \
+$PREFIX "./roq-json-bridge" \
   --name "bridge" \
   --client_listen_address "tcp://$LOCAL_INTERFACE:1234" \
   $@

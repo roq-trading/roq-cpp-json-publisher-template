@@ -1,14 +1,14 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/bridge/client/application.hpp"
+#include "roq/bridge/json/application.hpp"
 
 #include "roq/logging.hpp"
 
 #include "roq/io/engine/context_factory.hpp"
 
-#include "roq/bridge/client/config.hpp"
-#include "roq/bridge/client/controller.hpp"
-#include "roq/bridge/client/settings.hpp"
+#include "roq/bridge/json/config.hpp"
+#include "roq/bridge/json/controller.hpp"
+#include "roq/bridge/json/settings.hpp"
 
 using namespace std::literals;
 

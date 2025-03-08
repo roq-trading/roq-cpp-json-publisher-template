@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/bridge/client/shared.hpp"
+#include "roq/bridge/json/shared.hpp"
 
 using namespace std::literals;
 

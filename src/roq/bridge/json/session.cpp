@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/bridge/client/session.hpp"
+#include "roq/bridge/json/session.hpp"
 
 #include <magic_enum/magic_enum_format.hpp>
 

@@ -1,8 +1,8 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/bridge/client/config.hpp"
+#include "roq/bridge/json/config.hpp"
 
-#include "roq/bridge/client/settings.hpp"
+#include "roq/bridge/json/settings.hpp"
 
 namespace roq {
 namespace bridge {

@@ -5,8 +5,8 @@
 #include <span>
 #include <string_view>
 
-#include "roq/bridge/client/config.hpp"
-#include "roq/bridge/client/settings.hpp"
+#include "roq/bridge/json/config.hpp"
+#include "roq/bridge/json/settings.hpp"
 
 namespace roq {
 namespace bridge {

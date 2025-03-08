@@ -13,10 +13,10 @@
 
 #include "roq/io/net/tcp/listener.hpp"
 
-#include "roq/bridge/client/config.hpp"
-#include "roq/bridge/client/session.hpp"
-#include "roq/bridge/client/settings.hpp"
-#include "roq/bridge/client/shared.hpp"
+#include "roq/bridge/json/config.hpp"
+#include "roq/bridge/json/session.hpp"
+#include "roq/bridge/json/settings.hpp"
+#include "roq/bridge/json/shared.hpp"
 
 namespace roq {
 namespace bridge {

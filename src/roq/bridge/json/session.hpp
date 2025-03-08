@@ -11,8 +11,8 @@
 
 #include "roq/web/rest/server.hpp"
 
-#include "roq/bridge/client/bridge.hpp"
-#include "roq/bridge/client/shared.hpp"
+#include "roq/bridge/json/bridge.hpp"
+#include "roq/bridge/json/shared.hpp"
 
 namespace roq {
 namespace bridge {
