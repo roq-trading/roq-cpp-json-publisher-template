@@ -11,14 +11,13 @@
 
 #include "roq/web/rest/server.hpp"
 
-#include "roq/bridge/json/bridge.hpp"
 #include "roq/bridge/json/shared.hpp"
 
 namespace roq {
 namespace bridge {
 namespace json {
 
-struct Session final : public web::rest::Server::Handler, public Bridge::Handler {
+struct Session final : public web::rest::Server::Handler {
   struct Disconnect final {
     uint64_t session_id = {};
   };
@@ -31,14 +30,7 @@ struct Session final : public web::rest::Server::Handler, public Bridge::Handler
 
   Session(Session const &) = delete;
 
-  inline void dispatch() {
-    if (bridge_)
-      (*bridge_).dispatch();
-  }
-
   void ping(std::chrono::nanoseconds now);
-
-  void write(std::span<std::byte const> const &);
 
  protected:
   // web::rest::Server::Handler
@@ -47,11 +39,6 @@ struct Session final : public web::rest::Server::Handler, public Bridge::Handler
   void operator()(web::rest::Server::Request const &) override;
   void operator()(web::rest::Server::Text const &) override;
   void operator()(web::rest::Server::Binary const &) override;
-
-  // Bridge::Handler
-
-  void operator()(Bridge::Text const &) override;
-  void operator()(Bridge::Binary const &) override;
 
   // utils
 
@@ -64,6 +51,7 @@ struct Session final : public web::rest::Server::Handler, public Bridge::Handler
   void operator()(State);
 
   void check_upgrade(web::rest::Server::Request const &);
+  void check_request(web::rest::Server::Request const &);
 
   void disconnect();
 
@@ -75,7 +63,6 @@ struct Session final : public web::rest::Server::Handler, public Bridge::Handler
   std::unique_ptr<web::rest::Server> const server_;
   std::chrono::nanoseconds last_refresh_ = {};
   State state_ = {};
-  std::unique_ptr<Bridge> bridge_;
 };
 
 }  // namespace json

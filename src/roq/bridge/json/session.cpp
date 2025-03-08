@@ -46,19 +46,24 @@ auto create_server(auto &handler, auto &settings, auto &factory) {
 struct Query final {
   explicit Query(web::rest::Server::Request const &request) {
     enum class Key {
-      CODEC,
+      EXCHANGE,
+      SYMBOL,
     };
-    for (auto &[k, v] : request.query) {
-      auto key = utils::parse_enum<Key>(k);
-      switch (key) {
-        case Key::CODEC:
-          codec = v;
+    for (auto &[key, value] : request.query) {
+      auto key_2 = utils::parse_enum<Key>(key);
+      switch (key_2) {
+        case Key::EXCHANGE:
+          exchange = value;
+          break;
+        case Key::SYMBOL:
+          symbol = value;
           break;
       };
     }
   }
 
-  std::string_view codec;
+  std::string_view exchange;
+  std::string_view symbol;
 };
 }  // namespace
 
@@ -104,13 +109,12 @@ void Session::operator()(web::rest::Server::Request const &request) {
     (*server_).upgrade(request);
     state_ = State::READY;
   } else {
-    log::warn("[{}] Expected upgrade request"sv, session_id_);
-    disconnect();
+    check_request(request);
   }
 }
 
-void Session::operator()(web::rest::Server::Text const &text) {
-  log::info("[{}] Text"sv, session_id_);
+void Session::operator()(web::rest::Server::Text const &) {
+  log::debug("[{}] Text"sv, session_id_);
   last_refresh_ = clock::get_system();
   switch (state_) {
     using enum State;
@@ -118,16 +122,15 @@ void Session::operator()(web::rest::Server::Text const &text) {
       disconnect();
       break;
     case READY:
-      assert(bridge_);
-      (*bridge_).dispatch(text.payload);
+      assert(false);  // XXX FIXME TODO
       break;
     case ZOMBIE:
       break;
   }
 }
 
-void Session::operator()(web::rest::Server::Binary const &binary) {
-  log::info("[{}] Binary"sv, session_id_);
+void Session::operator()(web::rest::Server::Binary const &) {
+  log::debug("[{}] Binary"sv, session_id_);
   last_refresh_ = clock::get_system();
   switch (state_) {
     using enum State;
@@ -135,22 +138,11 @@ void Session::operator()(web::rest::Server::Binary const &binary) {
       disconnect();
       break;
     case READY:
-      assert(bridge_);
-      (*bridge_).dispatch(binary.payload);
+      assert(false);  // XXX FIXME TODO
       break;
     case ZOMBIE:
       break;
   }
-}
-
-// Bridge::Handler
-
-void Session::operator()(Bridge::Text const &text) {
-  (*server_).send_text(text.payload);
-}
-
-void Session::operator()(Bridge::Binary const &binary) {
-  (*server_).send_binary(binary.payload);
 }
 
 // utils
@@ -163,19 +155,34 @@ void Session::operator()(State state) {
 
 void Session::check_upgrade(web::rest::Server::Request const &request) {
   Query query{request};
-  if (std::empty(query.codec))
-    throw RuntimeError{"Unexpected: missing 'codec' (query param)"sv};
-  auto type = utils::parse_enum<codec::Type>(query.codec);
-  // XXX FIXME TODO we need subscriptions communicated before this... only then do we create the Config
-  assert(!bridge_);
-  // XXX FIXME TODO singleton
-  bridge_ = std::make_unique<Bridge>(*this, shared_.settings, shared_.config, context_, shared_.params, type);
+  if (std::empty(query.exchange))
+    throw RuntimeError{"Unexpected: missing 'exchange' (query param)"sv};
+  if (std::empty(query.symbol))
+    throw RuntimeError{"Unexpected: missing 'symbol' (query param)"sv};
+}
+
+void Session::check_request(web::rest::Server::Request const &request) {
+  auto path = request.path;
+  log::warn("DBUG path=[{}]"sv, fmt::join(path, ", "sv));
+  if (std::empty(path))
+    return;
+  enum class Type {
+    REFERENCE_DATA,
+    TOP_OF_BOOK,
+  };
+  auto type = utils::parse_enum<Type>(path[0]);
+  log::warn("DEBUG type={}"sv, type);
+  Query query{request};
+  if (std::empty(query.exchange))
+    throw RuntimeError{"Unexpected: missing 'exchange' (query param)"sv};
+  if (std::empty(query.symbol))
+    throw RuntimeError{"Unexpected: missing 'symbol' (query param)"sv};
+  log::warn(R"(DEBUG exchange="{}", symbol="{}")"sv, query.exchange, query.symbol);
 }
 
 void Session::disconnect() {
   auto helper = [&]() {
     (*this)(State::ZOMBIE);
-    bridge_.reset();
     auto disconnect = Disconnect{
         .session_id = session_id_,
     };

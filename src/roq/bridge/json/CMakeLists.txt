@@ -4,7 +4,6 @@ add_subdirectory(flags)
 
 set(SOURCES
     application.cpp
-    bridge.cpp
     config.cpp
     controller.cpp
     session.cpp

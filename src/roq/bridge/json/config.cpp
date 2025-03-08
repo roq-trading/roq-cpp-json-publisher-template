@@ -4,6 +4,8 @@
 
 #include "roq/bridge/json/settings.hpp"
 
+using namespace std::literals;
+
 namespace roq {
 namespace bridge {
 namespace json {
@@ -13,28 +15,18 @@ namespace json {
 Config::Config(Settings const &settings) : settings_{settings} {
 }
 
-void Config::dispatch(Handler &) const {
-  /*
-  // settings
-  handler(client::Settings{
-      .order_cancel_policy = OrderCancelPolicy::MANAGED_ORDERS,
-      .order_management = {},
-  });
-  // accounts
+void Config::dispatch(Handler &handler) const {
   handler(client::Account{
-      .regex = settings_.account,
+      .regex = ".*"sv,
   });
-  // symbols
   handler(client::Symbol{
-      .regex = settings_.symbol,
-      .exchange = settings_.exchange,
+      .regex = ".*"sv,
+      .exchange = "deribit"sv,
   });
-  // currencies
   handler(client::Symbol{
-      .regex = settings_.currencies,
+      .regex = ".*"sv,
       .exchange = {},
   });
-  */
 }
 
 }  // namespace json
