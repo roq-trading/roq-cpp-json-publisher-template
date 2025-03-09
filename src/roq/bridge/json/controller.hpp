@@ -55,8 +55,10 @@ struct Controller final : public io::sys::Signal::Handler,
 
   // client::Handler
 
+  void operator()(Event<Disconnected> const &) override;
   void operator()(Event<ReferenceData> const &) override;
   void operator()(Event<TopOfBook> const &) override;
+  void operator()(Event<PositionUpdate> const &) override;
 
   // utils
 

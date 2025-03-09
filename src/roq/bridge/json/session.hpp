@@ -50,10 +50,15 @@ struct Session final : public web::rest::Server::Handler {
 
   void operator()(State);
 
-  void check_upgrade(web::rest::Server::Request const &);
-  void check_request(web::rest::Server::Request const &);
-
   void disconnect();
+
+  void process_request(web::rest::Server::Request const &);
+
+  void process_reference_data(web::rest::Server::Request const &, std::string_view const &exchange, std::string_view const &symbol);
+  void process_top_of_book(web::rest::Server::Request const &, std::string_view const &exchange, std::string_view const &symbol);
+  void process_position(web::rest::Server::Request const &, std::string_view const &exchange, std::string_view const &symbol, std::string_view const &account);
+
+  void send_response(web::rest::Server::Request const &, web::http::Status, std::string_view const &body = {});
 
  private:
   Handler &handler_;

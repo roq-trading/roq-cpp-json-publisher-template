@@ -25,6 +25,8 @@ namespace json {
 
 namespace {
 auto const TIMEOUT = 5s;
+
+auto const CACHE_CONTROL_NO_STORE = "no-store"sv;
 }  // namespace
 
 // === HELPERS ===
@@ -48,6 +50,7 @@ struct Query final {
     enum class Key {
       EXCHANGE,
       SYMBOL,
+      ACCOUNT,
     };
     for (auto &[key, value] : request.query) {
       auto key_2 = utils::parse_enum<Key>(key);
@@ -58,10 +61,14 @@ struct Query final {
         case Key::SYMBOL:
           symbol = value;
           break;
+        case Key::ACCOUNT:
+          account = value;
+          break;
       };
     }
   }
 
+  std::string_view account;
   std::string_view exchange;
   std::string_view symbol;
 };
@@ -104,12 +111,11 @@ void Session::operator()(web::rest::Server::Request const &request) {
   log::info("[{}] Request"sv, session_id_);
   last_refresh_ = clock::get_system();
   if (request.headers.connection.has(web::http::Connection::UPGRADE)) {
-    check_upgrade(request);
     log::info("[{}] Upgrading to websocket..."sv, session_id_);
     (*server_).upgrade(request);
     state_ = State::READY;
   } else {
-    check_request(request);
+    process_request(request);
   }
 }
 
@@ -153,33 +159,6 @@ void Session::operator()(State state) {
   }
 }
 
-void Session::check_upgrade(web::rest::Server::Request const &request) {
-  Query query{request};
-  if (std::empty(query.exchange))
-    throw RuntimeError{"Unexpected: missing 'exchange' (query param)"sv};
-  if (std::empty(query.symbol))
-    throw RuntimeError{"Unexpected: missing 'symbol' (query param)"sv};
-}
-
-void Session::check_request(web::rest::Server::Request const &request) {
-  auto path = request.path;
-  log::warn("DBUG path=[{}]"sv, fmt::join(path, ", "sv));
-  if (std::empty(path))
-    return;
-  enum class Type {
-    REFERENCE_DATA,
-    TOP_OF_BOOK,
-  };
-  auto type = utils::parse_enum<Type>(path[0]);
-  log::warn("DEBUG type={}"sv, type);
-  Query query{request};
-  if (std::empty(query.exchange))
-    throw RuntimeError{"Unexpected: missing 'exchange' (query param)"sv};
-  if (std::empty(query.symbol))
-    throw RuntimeError{"Unexpected: missing 'symbol' (query param)"sv};
-  log::warn(R"(DEBUG exchange="{}", symbol="{}")"sv, query.exchange, query.symbol);
-}
-
 void Session::disconnect() {
   auto helper = [&]() {
     (*this)(State::ZOMBIE);
@@ -200,6 +179,114 @@ void Session::disconnect() {
     case ZOMBIE:
       break;
   }
+}
+
+void Session::process_request(web::rest::Server::Request const &request) {
+  auto path = request.path;
+  log::warn("DBUG path=[{}]"sv, fmt::join(path, ", "sv));
+  if (std::empty(path))
+    return;
+  enum class Type {
+    REFERENCE_DATA,
+    TOP_OF_BOOK,
+    POSITION,
+  };
+  auto type = utils::parse_enum<Type>(path[0]);
+  log::warn("DEBUG type={}"sv, type);
+  Query query{request};
+  switch (type) {
+    using enum Type;
+    case REFERENCE_DATA:
+      process_reference_data(request, query.exchange, query.symbol);
+      break;
+    case TOP_OF_BOOK:
+      process_top_of_book(request, query.exchange, query.symbol);
+      break;
+    case POSITION:
+      process_position(request, query.exchange, query.symbol, query.account);
+      break;
+  }
+  log::info("HERE"sv);
+}
+
+void Session::process_reference_data(web::rest::Server::Request const &request, std::string_view const &exchange, std::string_view const &symbol) {
+  log::info("HERE"sv);
+  auto helper = [&](auto &source) {
+    auto helper_2 = [&](auto id) {
+      auto iter = source.reference_data.find(id);
+      if (iter == std::end(source.reference_data)) {
+        send_response(request, web::http::Status::NOT_FOUND);
+      } else {
+        auto &reference_data = (*iter).second;
+        auto body = fmt::format(
+            R"({{)"
+            R"("tick_size":{})"
+            R"(}})"sv,
+            reference_data.tick_size);
+        send_response(request, web::http::Status::OK, body);
+      }
+    };
+    if (!source.get_id(helper_2, exchange, symbol)) {
+      send_response(request, web::http::Status::NOT_FOUND);
+    }
+  };
+  uint8_t source = {};  // XXX FIXME TODO
+  shared_.get_source(helper, source);
+}
+
+void Session::process_top_of_book(web::rest::Server::Request const &request, std::string_view const &exchange, std::string_view const &symbol) {
+  log::info("HERE"sv);
+  auto helper = [&](auto &source) {
+    auto helper_2 = [&](auto id) {
+      auto iter = source.top_of_book.find(id);
+      if (iter == std::end(source.top_of_book)) {
+        log::warn("DEBUG not found"sv);
+      } else {
+        auto &top_of_book = (*iter).second;
+        auto body = fmt::format(
+            R"({{)"
+            R"("bid_price":{},)"
+            R"("ask_price":{})"
+            R"(}})"sv,
+            top_of_book.layer.bid_price,
+            top_of_book.layer.ask_price);
+        log::warn(R"(DEBUG body="{}")"sv, body);
+        send_response(request, web::http::Status::OK, body);
+      }
+    };
+    if (!source.get_id(helper_2, exchange, symbol)) {
+      log::warn("DEBUG not found"sv);
+      send_response(request, web::http::Status::NOT_FOUND);
+    }
+  };
+  uint8_t source = {};  // XXX FIXME TODO
+  shared_.get_source(helper, source);
+}
+
+void Session::process_position(
+    web::rest::Server::Request const &request, std::string_view const &exchange, std::string_view const &symbol, std::string_view const &account) {
+}
+
+void Session::send_response(web::rest::Server::Request const &request, web::http::Status status, std::string_view const &body) {
+  auto connection = [&]() -> web::http::Connection {
+    if (status == web::http::Status::OK && request.headers.connection.has(web::http::Connection::KEEP_ALIVE))
+      return web::http::Connection::KEEP_ALIVE;
+    return web::http::Connection::CLOSE;
+  }();
+  auto content_type = [&]() -> web::http::ContentType {
+    if (std::empty(body))
+      return {};
+    return web::http::ContentType::APPLICATION_JSON;
+  }();
+  auto response = web::rest::Server::Response{
+      .status = status,
+      .connection = connection,
+      .sec_websocket_accept = {},
+      .cache_control = CACHE_CONTROL_NO_STORE,
+      .content_type = content_type,
+      .body = body,
+  };
+  (*server_).send(response);
 }
 
 }  // namespace json
