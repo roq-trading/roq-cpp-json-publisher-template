@@ -54,11 +54,25 @@ struct Session final : public web::rest::Server::Handler {
 
   void process_request(web::rest::Server::Request const &);
 
-  void process_reference_data(web::rest::Server::Request const &, std::string_view const &exchange, std::string_view const &symbol);
-  void process_top_of_book(web::rest::Server::Request const &, std::string_view const &exchange, std::string_view const &symbol);
-  void process_position(web::rest::Server::Request const &, std::string_view const &exchange, std::string_view const &symbol, std::string_view const &account);
+  void process_reference_data(
+      web::rest::Server::Request const &, std::string_view const &source, std::string_view const &exchange, std::string_view const &symbol);
+  void process_top_of_book(
+      web::rest::Server::Request const &, std::string_view const &source, std::string_view const &exchange, std::string_view const &symbol);
+  void process_position(
+      web::rest::Server::Request const &,
+      std::string_view const &source,
+      std::string_view const &exchange,
+      std::string_view const &symbol,
+      std::string_view const &account);
 
   void send_response(web::rest::Server::Request const &, web::http::Status, std::string_view const &body = {});
+
+  template <typename Callback>
+  bool get_source(Callback, std::string_view const &source, std::string_view const &exchange, std::string_view const &symbol) const;
+
+  template <typename Callback>
+  bool get_source_and_account(
+      Callback, std::string_view const &source, std::string_view const &exchange, std::string_view const &symbol, std::string_view const &account) const;
 
  private:
   Handler &handler_;

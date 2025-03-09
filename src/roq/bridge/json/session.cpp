@@ -48,6 +48,7 @@ auto create_server(auto &handler, auto &settings, auto &factory) {
 struct Query final {
   explicit Query(web::rest::Server::Request const &request) {
     enum class Key {
+      SOURCE,
       EXCHANGE,
       SYMBOL,
       ACCOUNT,
@@ -55,6 +56,9 @@ struct Query final {
     for (auto &[key, value] : request.query) {
       auto key_2 = utils::parse_enum<Key>(key);
       switch (key_2) {
+        case Key::SOURCE:
+          source = value;
+          break;
         case Key::EXCHANGE:
           exchange = value;
           break;
@@ -68,6 +72,7 @@ struct Query final {
     }
   }
 
+  std::string_view source;
   std::string_view account;
   std::string_view exchange;
   std::string_view symbol;
@@ -197,74 +202,80 @@ void Session::process_request(web::rest::Server::Request const &request) {
   switch (type) {
     using enum Type;
     case REFERENCE_DATA:
-      process_reference_data(request, query.exchange, query.symbol);
+      process_reference_data(request, query.source, query.exchange, query.symbol);
       break;
     case TOP_OF_BOOK:
-      process_top_of_book(request, query.exchange, query.symbol);
+      process_top_of_book(request, query.source, query.exchange, query.symbol);
       break;
     case POSITION:
-      process_position(request, query.exchange, query.symbol, query.account);
+      process_position(request, query.source, query.exchange, query.symbol, query.account);
       break;
   }
-  log::info("HERE"sv);
 }
 
-void Session::process_reference_data(web::rest::Server::Request const &request, std::string_view const &exchange, std::string_view const &symbol) {
-  log::info("HERE"sv);
-  auto helper = [&](auto &source) {
-    auto helper_2 = [&](auto id) {
-      auto iter = source.reference_data.find(id);
-      if (iter == std::end(source.reference_data)) {
-        send_response(request, web::http::Status::NOT_FOUND);
-      } else {
-        auto &reference_data = (*iter).second;
-        auto body = fmt::format(
-            R"({{)"
-            R"("tick_size":{})"
-            R"(}})"sv,
-            reference_data.tick_size);
-        send_response(request, web::http::Status::OK, body);
-      }
-    };
-    if (!source.get_id(helper_2, exchange, symbol)) {
-      send_response(request, web::http::Status::NOT_FOUND);
-    }
+void Session::process_reference_data(
+    web::rest::Server::Request const &request, std::string_view const &source, std::string_view const &exchange, std::string_view const &symbol) {
+  auto helper = [&](auto &source, auto id) {
+    auto iter = source.reference_data.find(id);
+    if (iter == std::end(source.reference_data))
+      return;  // not found
+    auto &reference_data = (*iter).second;
+    auto body = fmt::format(
+        R"({{)"
+        R"("description":"{}",)"
+        R"("tick_size":{})"
+        R"(}})"sv,
+        reference_data.description,
+        reference_data.tick_size);
+    send_response(request, web::http::Status::OK, body);
   };
-  uint8_t source = {};  // XXX FIXME TODO
-  shared_.get_source(helper, source);
+  get_source(helper, source, exchange, symbol);
 }
 
-void Session::process_top_of_book(web::rest::Server::Request const &request, std::string_view const &exchange, std::string_view const &symbol) {
-  log::info("HERE"sv);
-  auto helper = [&](auto &source) {
-    auto helper_2 = [&](auto id) {
-      auto iter = source.top_of_book.find(id);
-      if (iter == std::end(source.top_of_book)) {
-        log::warn("DEBUG not found"sv);
-      } else {
-        auto &top_of_book = (*iter).second;
-        auto body = fmt::format(
-            R"({{)"
-            R"("bid_price":{},)"
-            R"("ask_price":{})"
-            R"(}})"sv,
-            top_of_book.layer.bid_price,
-            top_of_book.layer.ask_price);
-        log::warn(R"(DEBUG body="{}")"sv, body);
-        send_response(request, web::http::Status::OK, body);
-      }
-    };
-    if (!source.get_id(helper_2, exchange, symbol)) {
-      log::warn("DEBUG not found"sv);
-      send_response(request, web::http::Status::NOT_FOUND);
-    }
+void Session::process_top_of_book(
+    web::rest::Server::Request const &request, std::string_view const &source, std::string_view const &exchange, std::string_view const &symbol) {
+  auto helper = [&](auto &source, auto id) {
+    auto iter = source.top_of_book.find(id);
+    if (iter == std::end(source.top_of_book))
+      return;  // not found
+    auto &top_of_book = (*iter).second;
+    auto body = fmt::format(
+        R"({{)"
+        R"("bid_price":{},)"
+        R"("ask_price":{})"
+        R"(}})"sv,
+        top_of_book.layer.bid_price,
+        top_of_book.layer.ask_price);
+    log::warn(R"(DEBUG body="{}")"sv, body);
+    send_response(request, web::http::Status::OK, body);
   };
-  uint8_t source = {};  // XXX FIXME TODO
-  shared_.get_source(helper, source);
+  get_source(helper, source, exchange, symbol);
 }
 
 void Session::process_position(
-    web::rest::Server::Request const &request, std::string_view const &exchange, std::string_view const &symbol, std::string_view const &account) {
+    [[maybe_unused]] web::rest::Server::Request const &request,
+    std::string_view const &source,
+    std::string_view const &exchange,
+    std::string_view const &symbol,
+    std::string_view const &account) {
+  auto helper = [&]([[maybe_unused]] auto &source, auto &account, auto id) {
+    auto iter = account.position.find(id);
+    if (iter == std::end(account.position))
+      return;  // not found
+    /* XXX FIXME TODO
+    auto &position = (*iter).second;
+    auto body = fmt::format(
+        R"({{)"
+        R"("long_quantity":{},)"
+        R"("short_quantity":{})"
+        R"(}})"sv,
+        position.long_quantity,
+        position.short_quantity);
+    log::warn(R"(DEBUG body="{}")"sv, body);
+    send_response(request, web::http::Status::OK, body);
+    */
+  };
+  get_source_and_account(helper, source, exchange, symbol, account);
 }
 
 void Session::send_response(web::rest::Server::Request const &request, web::http::Status status, std::string_view const &body) {
@@ -287,6 +298,36 @@ void Session::send_response(web::rest::Server::Request const &request, web::http
       .body = body,
   };
   (*server_).send(response);
+}
+
+template <typename Callback>
+bool Session::get_source(Callback callback, std::string_view const &source, std::string_view const &exchange, std::string_view const &symbol) const {
+  auto result = false;
+  auto helper = [&](auto &source) {
+    auto helper_2 = [&](auto id) {
+      result = true;
+      callback(source, id);
+    };
+    source.get_id(helper_2, exchange, symbol);
+  };
+  shared_.get_source(helper, source);
+  return result;
+}
+
+template <typename Callback>
+bool Session::get_source_and_account(
+    Callback callback, std::string_view const &source, std::string_view const &exchange, std::string_view const &symbol, std::string_view const &account)
+    const {
+  auto result = false;
+  auto helper = [&](auto &source, auto id) {
+    auto helper_2 = [&](auto &account) {
+      result = true;
+      callback(source, account, id);
+    };
+    source.get_account(helper_2, account);
+  };
+  get_source(helper, source, exchange, symbol);
+  return result;
 }
 
 }  // namespace json

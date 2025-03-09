@@ -34,9 +34,9 @@ struct Shared final {
 
      protected:
       friend Shared;
+
       void operator()(Event<PositionUpdate> const &, uint64_t id);
     };
-    utils::unordered_map<std::string, Account> accounts;
 
     template <typename Callback>
     bool get_id(Callback callback, std::string_view const &exchange, std::string_view const &symbol) {
@@ -52,8 +52,8 @@ struct Shared final {
 
     template <typename Callback>
     bool get_account(Callback callback, std::string_view const &account) {
-      auto iter = accounts.find(account);
-      if (iter == std::end(accounts))
+      auto iter = accounts_.find(account);
+      if (iter == std::end(accounts_))
         return false;
       callback((*iter).second);
       return true;
@@ -68,15 +68,18 @@ struct Shared final {
    private:
     uint64_t next_id_ = {};
     utils::unordered_map<std::string, utils::unordered_map<std::string, uint64_t>> lookup_;
+    utils::unordered_map<std::string, Account> accounts_;
   };
-  utils::unordered_map<uint8_t, Source> sources;
 
   template <typename Callback>
-  bool get_source(Callback callback, uint8_t source) {
-    auto iter = sources.find(source);
-    if (iter == std::end(sources))
+  bool get_source(Callback callback, std::string_view const &source) {
+    auto iter_1 = lookup_.find(source);
+    if (iter_1 == std::end(lookup_))
       return false;
-    callback((*iter).second);
+    auto iter_2 = sources_.find((*iter_1).second);
+    if (iter_2 == std::end(sources_))
+      return false;
+    callback((*iter_2).second);
     return true;
   }
 
@@ -84,8 +87,10 @@ struct Shared final {
   void operator()(Event<T> const &event) {
     using value_type = std::remove_cvref<T>::type;
     auto &[message_info, value] = event;
-    if constexpr (std::is_same<value_type, Disconnected>::value) {
-      sources.erase(message_info.source);
+    if constexpr (std::is_same<value_type, Connected>::value) {
+      create_source(message_info.source, message_info.source_name);
+    } else if constexpr (std::is_same<value_type, Disconnected>::value) {
+      remove_source(message_info.source, message_info.source_name);
     } else {
       auto &source = get_source(message_info.source);
       auto id = get_id(source, value.exchange, value.symbol);
@@ -100,9 +105,15 @@ struct Shared final {
   }
 
  protected:
+  void create_source(uint8_t source, std::string_view const &source_name);
+  void remove_source(uint8_t source, std::string_view const &source_name);
   Source &get_source(uint8_t source);
   Source::Account &get_account(Source &, std::string_view const &account);
   uint64_t get_id(Source &, std::string_view const &exchange, std::string_view const &symbol);
+
+ private:
+  utils::unordered_map<uint8_t, Source> sources_;
+  utils::unordered_map<std::string, uint8_t> lookup_;
 };
 
 }  // namespace json

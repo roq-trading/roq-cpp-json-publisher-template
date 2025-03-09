@@ -2,6 +2,8 @@
 
 #include "roq/bridge/json/shared.hpp"
 
+#include "roq/logging.hpp"
+
 using namespace std::literals;
 
 namespace roq {
@@ -25,17 +27,39 @@ void apply(R &result, auto &event, auto id) {
 Shared::Shared(Settings const &settings) : settings{settings} {
 }
 
+void Shared::create_source(uint8_t source, std::string_view const &source_name) {
+  auto iter_1 = sources_.find(source);
+  if (iter_1 != std::end(sources_))
+    log::fatal("Unexpected"sv);
+  auto iter_2 = lookup_.find(source_name);
+  if (iter_2 != std::end(lookup_))
+    log::fatal("Unexpected"sv);
+  lookup_.try_emplace(source_name, source);
+  sources_.try_emplace(source);
+}
+
+void Shared::remove_source(uint8_t source, std::string_view const &source_name) {
+  auto iter = lookup_.find(source_name);
+  if (iter != std::end(lookup_)) {
+    if ((*iter).second != source)
+      log::fatal("Unexpected"sv);
+  }
+  lookup_.erase(iter);
+  sources_.erase(source);
+}
+
 Shared::Source &Shared::get_source(uint8_t source) {
-  auto iter = sources.find(source);
-  if (iter == std::end(sources)) [[unlikely]]
-    iter = sources.try_emplace(source).first;
+  auto iter = sources_.find(source);
+  if (iter == std::end(sources_)) [[unlikely]]
+    log::fatal("Unexpected"sv);
+  iter = sources_.try_emplace(source).first;
   return (*iter).second;
 }
 
 Shared::Source::Account &Shared::get_account(Source &source, std::string_view const &account) {
-  auto iter = source.accounts.find(account);
-  if (iter == std::end(source.accounts)) [[unlikely]]
-    iter = source.accounts.try_emplace(account).first;
+  auto iter = source.accounts_.find(account);
+  if (iter == std::end(source.accounts_)) [[unlikely]]
+    iter = source.accounts_.try_emplace(account).first;
   return (*iter).second;
 }
 

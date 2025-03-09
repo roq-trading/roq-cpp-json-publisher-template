@@ -117,6 +117,10 @@ void Controller::operator()(Session::Disconnect const &disconnect) {
 
 // client::Handler
 
+void Controller::operator()(Event<Connected> const &event) {
+  shared_(event);
+}
+
 void Controller::operator()(Event<Disconnected> const &event) {
   shared_(event);
 }
