@@ -6,16 +6,29 @@
 
 #include "roq/utils/container.hpp"
 
-#include "roq/cache/position.hpp"
-#include "roq/cache/reference_data.hpp"
-#include "roq/cache/top_of_book.hpp"
-
 #include "roq/samples/publisher/json/settings.hpp"
 
 namespace roq {
 namespace samples {
 namespace publisher {
 namespace json {
+
+namespace cache {
+struct ReferenceData final {
+  bool operator()(roq::ReferenceData const &);
+  std::string description;
+  double tick_size = NaN;
+};
+struct TopOfBook final {
+  bool operator()(roq::TopOfBook const &);
+  Layer layer;
+};
+struct Position final {
+  bool operator()(roq::PositionUpdate const &);
+  double long_quantity = NaN;
+  double short_quantity = NaN;
+};
+}  // namespace cache
 
 struct Shared final {
   explicit Shared(Settings const &);

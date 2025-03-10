@@ -28,7 +28,8 @@ else
 fi
 
 $PREFIX "./roq-cpp-json-publisher-template" \
-  --name "trader" \
+  --name "risk" \
+  --drop_copy=true \
   --client_listen_address "tcp://$LOCAL_INTERFACE:1234" \
   --url_prefix "roq" \
   $@

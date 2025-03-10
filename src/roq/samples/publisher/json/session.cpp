@@ -317,7 +317,6 @@ void Session::process_position(
     auto iter = account.position.find(id);
     if (iter == std::end(account.position))
       return;  // not found
-    /* XXX FIXME TODO
     auto &position = (*iter).second;
     auto body = fmt::format(
         R"({{)"
@@ -328,7 +327,6 @@ void Session::process_position(
         position.short_quantity);
     log::warn(R"(DEBUG body="{}")"sv, body);
     send_response(request, web::http::Status::OK, body);
-    */
   };
   get_source_and_account(helper, source, exchange, symbol, account);
 }

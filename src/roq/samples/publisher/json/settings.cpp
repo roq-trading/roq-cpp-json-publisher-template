@@ -13,7 +13,7 @@ namespace samples {
 namespace publisher {
 namespace json {
 
-Settings::Settings(args::Parser const &args) : roq::client::flags::Settings{args}, flags{flags::Flags::create()} {
+Settings::Settings(args::Parser const &args) : client::flags::Settings{args}, flags{flags::Flags::create()} {
   log::info("settings={}"sv, *this);
 }
 

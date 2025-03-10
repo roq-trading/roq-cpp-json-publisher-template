@@ -4,6 +4,8 @@
 
 #include "roq/logging.hpp"
 
+#include "roq/utils/update.hpp"
+
 using namespace std::literals;
 
 namespace roq {
@@ -24,6 +26,28 @@ void apply(R &result, auto &event, auto id) {
 }  // namespace
 
 // === IMPLEMENTATION ===
+
+namespace cache {
+bool ReferenceData::operator()(roq::ReferenceData const &value) {
+  auto result = false;
+  result |= utils::update(description, value.description);
+  result |= utils::update(tick_size, value.tick_size);
+  return result;
+}
+
+bool TopOfBook::operator()(roq::TopOfBook const &value) {
+  auto result = false;
+  result |= utils::update(layer, value.layer);
+  return result;
+}
+
+bool Position::operator()(roq::PositionUpdate const &value) {
+  auto result = false;
+  result |= utils::update(long_quantity, value.long_quantity);
+  result |= utils::update(short_quantity, value.short_quantity);
+  return result;
+}
+}  // namespace cache
 
 Shared::Shared(Settings const &settings) : settings{settings} {
 }

@@ -11,8 +11,8 @@ namespace samples {
 namespace publisher {
 namespace json {
 
-struct Application final : public roq::Service {
-  using roq::Service::Service;
+struct Application final : public Service {
+  using Service::Service;
 
  protected:
   int main(args::Parser const &) override;
