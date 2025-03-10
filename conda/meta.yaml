@@ -1,5 +1,5 @@
 package:
-  name: roq-cpp-json-bridge-template
+  name: roq-cpp-json-publisher-template
   version: {{ GIT_DESCRIBE_TAG }}
 
 source:
@@ -43,4 +43,4 @@ about:
   license: MIT
   license_family: MIT
   license_file: LICENSE
-  summary: Roq JSON Bridge (a template project)
+  summary: Roq JSON Publisher (a template project)

@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/samples/bridge/json/shared.hpp"
+#include "roq/samples/publisher/json/shared.hpp"
 
 #include "roq/logging.hpp"
 
@@ -8,7 +8,7 @@ using namespace std::literals;
 
 namespace roq {
 namespace samples {
-namespace bridge {
+namespace publisher {
 namespace json {
 
 // === HELPERS ===
@@ -85,6 +85,6 @@ void Shared::Source::Account::operator()(Event<PositionUpdate> const &event, uin
 }
 
 }  // namespace json
-}  // namespace bridge
+}  // namespace publisher
 }  // namespace samples
 }  // namespace roq

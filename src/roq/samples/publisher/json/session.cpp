@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/samples/bridge/json/session.hpp"
+#include "roq/samples/publisher/json/session.hpp"
 
 #include <magic_enum/magic_enum_format.hpp>
 
@@ -19,7 +19,7 @@ using namespace std::literals;
 
 namespace roq {
 namespace samples {
-namespace bridge {
+namespace publisher {
 namespace json {
 
 // === CONSTANTS ===
@@ -334,6 +334,6 @@ void Session::process_position(
 }
 
 }  // namespace json
-}  // namespace bridge
+}  // namespace publisher
 }  // namespace samples
 }  // namespace roq

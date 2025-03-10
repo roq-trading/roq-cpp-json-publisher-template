@@ -1,14 +1,14 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/samples/bridge/json/config.hpp"
+#include "roq/samples/publisher/json/config.hpp"
 
-#include "roq/samples/bridge/json/settings.hpp"
+#include "roq/samples/publisher/json/settings.hpp"
 
 using namespace std::literals;
 
 namespace roq {
 namespace samples {
-namespace bridge {
+namespace publisher {
 namespace json {
 
 // === IMPLEMENTATION ===
@@ -31,6 +31,6 @@ void Config::dispatch(Handler &handler) const {
 }
 
 }  // namespace json
-}  // namespace bridge
+}  // namespace publisher
 }  // namespace samples
 }  // namespace roq

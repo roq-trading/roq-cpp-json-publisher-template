@@ -8,7 +8,7 @@
 
 namespace roq {
 namespace samples {
-namespace bridge {
+namespace publisher {
 namespace json {
 
 struct Application final : public roq::Service {
@@ -19,6 +19,6 @@ struct Application final : public roq::Service {
 };
 
 }  // namespace json
-}  // namespace bridge
+}  // namespace publisher
 }  // namespace samples
 }  // namespace roq

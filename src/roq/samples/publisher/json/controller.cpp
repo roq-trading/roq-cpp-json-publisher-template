@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/samples/bridge/json/controller.hpp"
+#include "roq/samples/publisher/json/controller.hpp"
 
 #include "roq/logging.hpp"
 
@@ -13,7 +13,7 @@ using namespace std::chrono_literals;
 
 namespace roq {
 namespace samples {
-namespace bridge {
+namespace publisher {
 namespace json {
 
 // === CONSTANTS ===
@@ -156,6 +156,6 @@ void Controller::remove_zombies() {
 }
 
 }  // namespace json
-}  // namespace bridge
+}  // namespace publisher
 }  // namespace samples
 }  // namespace roq

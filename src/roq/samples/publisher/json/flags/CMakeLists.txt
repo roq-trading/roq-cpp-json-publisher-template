@@ -2,7 +2,7 @@ set(TARGET_NAME ${PROJECT_NAME}-flags)
 
 include(RoqAutogen)
 
-set(NAMESPACE "roq/samples/bridge/json/flags")
+set(NAMESPACE "roq/samples/publisher/json/flags")
 
 set(AUTOGEN_SCHEMAS flags.json)
 

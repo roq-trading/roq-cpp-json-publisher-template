@@ -16,7 +16,7 @@ message("Using GIT_REPO_VERSION=${GIT_REPO_VERSION}")
 
 # project
 
-project(roq-cpp-json-bridge-template VERSION ${GIT_REPO_VERSION})
+project(roq-cpp-json-publisher-template VERSION ${GIT_REPO_VERSION})
 
 # language
 
@@ -78,7 +78,7 @@ include_directories(
 
 # sub-projects
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/src/roq/samples/bridge/json)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/roq/samples/publisher/json)
 
 if(BUILD_TESTING)
   add_subdirectory(${CMAKE_SOURCE_DIR}/test)

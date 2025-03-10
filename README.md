@@ -1,8 +1,8 @@
-A template project to help you get started with building a JSON bridge using Roq's C++ API.
+A template project to help you get started with building a JSON publisher using Roq's C++ API.
 
 The project includes
 
-* Bare-minimum implementation of a JSON bridge
+* Bare-minimum implementation of a JSON publisher
 
 * Test target
 

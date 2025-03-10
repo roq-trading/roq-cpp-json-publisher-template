@@ -11,11 +11,11 @@
 
 #include "roq/web/rest/server.hpp"
 
-#include "roq/samples/bridge/json/shared.hpp"
+#include "roq/samples/publisher/json/shared.hpp"
 
 namespace roq {
 namespace samples {
-namespace bridge {
+namespace publisher {
 namespace json {
 
 struct Session final : public web::rest::Server::Handler {
@@ -88,6 +88,6 @@ struct Session final : public web::rest::Server::Handler {
 };
 
 }  // namespace json
-}  // namespace bridge
+}  // namespace publisher
 }  // namespace samples
 }  // namespace roq

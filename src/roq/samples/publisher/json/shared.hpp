@@ -10,11 +10,11 @@
 #include "roq/cache/reference_data.hpp"
 #include "roq/cache/top_of_book.hpp"
 
-#include "roq/samples/bridge/json/settings.hpp"
+#include "roq/samples/publisher/json/settings.hpp"
 
 namespace roq {
 namespace samples {
-namespace bridge {
+namespace publisher {
 namespace json {
 
 struct Shared final {
@@ -118,6 +118,6 @@ struct Shared final {
 };
 
 }  // namespace json
-}  // namespace bridge
+}  // namespace publisher
 }  // namespace samples
 }  // namespace roq
