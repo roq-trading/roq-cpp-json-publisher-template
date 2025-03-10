@@ -6,13 +6,14 @@
 
 #include "roq/client.hpp"
 
-#include "roq/bridge/json/flags/flags.hpp"
+#include "roq/samples/bridge/json/flags/flags.hpp"
 
 namespace roq {
+namespace samples {
 namespace bridge {
 namespace json {
 
-struct Settings final : public roq::client::flags::Settings {
+struct Settings final : public client::flags::Settings {
   explicit Settings(args::Parser const &);
 
   flags::Flags flags;
@@ -20,12 +21,13 @@ struct Settings final : public roq::client::flags::Settings {
 
 }  // namespace json
 }  // namespace bridge
+}  // namespace samples
 }  // namespace roq
 
 template <>
-struct fmt::formatter<roq::bridge::json::Settings> {
+struct fmt::formatter<roq::samples::bridge::json::Settings> {
   constexpr auto parse(format_parse_context &context) { return std::begin(context); }
-  auto format(roq::bridge::json::Settings const &value, format_context &context) const {
+  auto format(roq::samples::bridge::json::Settings const &value, format_context &context) const {
     using namespace std::literals;
     return fmt::format_to(
         context.out(),

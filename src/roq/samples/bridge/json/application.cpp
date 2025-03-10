@@ -1,18 +1,19 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/bridge/json/application.hpp"
+#include "roq/samples/bridge/json/application.hpp"
 
 #include "roq/logging.hpp"
 
 #include "roq/io/engine/context_factory.hpp"
 
-#include "roq/bridge/json/config.hpp"
-#include "roq/bridge/json/controller.hpp"
-#include "roq/bridge/json/settings.hpp"
+#include "roq/samples/bridge/json/config.hpp"
+#include "roq/samples/bridge/json/controller.hpp"
+#include "roq/samples/bridge/json/settings.hpp"
 
 using namespace std::literals;
 
 namespace roq {
+namespace samples {
 namespace bridge {
 namespace json {
 
@@ -34,4 +35,5 @@ int Application::main(args::Parser const &args) {
 
 }  // namespace json
 }  // namespace bridge
+}  // namespace samples
 }  // namespace roq

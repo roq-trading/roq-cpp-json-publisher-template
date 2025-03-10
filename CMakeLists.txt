@@ -16,7 +16,7 @@ message("Using GIT_REPO_VERSION=${GIT_REPO_VERSION}")
 
 # project
 
-project(roq-json-bridge VERSION ${GIT_REPO_VERSION})
+project(roq-cpp-json-bridge-template VERSION ${GIT_REPO_VERSION})
 
 # language
 
@@ -31,13 +31,11 @@ include(GNUInstallDirs)
 find_package(absl REQUIRED)
 find_package(fmt REQUIRED)
 find_package(magic_enum REQUIRED)
-find_package(nameof REQUIRED)
 find_package(roq-algo REQUIRED)
 find_package(roq-api REQUIRED)
 find_package(roq-cache REQUIRED)
 find_package(roq-client REQUIRED)
 find_package(roq-codec REQUIRED)
-find_package(roq-fix REQUIRED)
 find_package(roq-flags REQUIRED)
 find_package(roq-io REQUIRED)
 find_package(roq-logging REQUIRED)
@@ -46,8 +44,6 @@ find_package(roq-utils REQUIRED)
 find_package(roq-web REQUIRED)
 find_package(tomlplusplus REQUIRED)
 find_package(unordered_dense REQUIRED)
-
-find_package(PkgConfig REQUIRED)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   include(CTest)
@@ -82,7 +78,7 @@ include_directories(
 
 # sub-projects
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/src/roq/bridge/json)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/roq/samples/bridge/json)
 
 if(BUILD_TESTING)
   add_subdirectory(${CMAKE_SOURCE_DIR}/test)

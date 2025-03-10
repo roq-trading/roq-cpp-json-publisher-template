@@ -1,12 +1,13 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/bridge/json/shared.hpp"
+#include "roq/samples/bridge/json/shared.hpp"
 
 #include "roq/logging.hpp"
 
 using namespace std::literals;
 
 namespace roq {
+namespace samples {
 namespace bridge {
 namespace json {
 
@@ -85,4 +86,5 @@ void Shared::Source::Account::operator()(Event<PositionUpdate> const &event, uin
 
 }  // namespace json
 }  // namespace bridge
+}  // namespace samples
 }  // namespace roq

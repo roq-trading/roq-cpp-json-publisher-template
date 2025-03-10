@@ -27,7 +27,7 @@ else
   PREFIX=
 fi
 
-$PREFIX "./roq-json-bridge" \
+$PREFIX "./roq-cpp-json-bridge-template" \
   --name "trader" \
   --client_listen_address "tcp://$LOCAL_INTERFACE:1234" \
   --url_prefix "roq" \

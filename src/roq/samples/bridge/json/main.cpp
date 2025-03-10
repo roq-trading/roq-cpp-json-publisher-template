@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/bridge/json/application.hpp"
+#include "roq/samples/bridge/json/application.hpp"
 
 #include "roq/flags/args.hpp"
 #include "roq/logging/flags/settings.hpp"
@@ -11,7 +11,7 @@ using namespace std::literals;
 
 namespace {
 auto const INFO = roq::Service::Info{
-    .description = "Roq JSON Bridge"sv,
+    .description = "JSON Bridge Template"sv,
     .package_name = ROQ_PACKAGE_NAME,
     .host = ROQ_HOST,
     .build_version = ROQ_BUILD_VERSION,
@@ -26,5 +26,5 @@ auto const INFO = roq::Service::Info{
 int main(int argc, char **argv) {
   roq::flags::Args args{argc, argv, INFO.description, INFO.build_version};
   roq::logging::flags::Settings settings{args};
-  return roq::bridge::json::Application{args, settings, INFO}.run();
+  return roq::samples::bridge::json::Application{args, settings, INFO}.run();
 }

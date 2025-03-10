@@ -15,12 +15,13 @@
 
 #include "roq/client/poller.hpp"
 
-#include "roq/bridge/json/config.hpp"
-#include "roq/bridge/json/session.hpp"
-#include "roq/bridge/json/settings.hpp"
-#include "roq/bridge/json/shared.hpp"
+#include "roq/samples/bridge/json/config.hpp"
+#include "roq/samples/bridge/json/session.hpp"
+#include "roq/samples/bridge/json/settings.hpp"
+#include "roq/samples/bridge/json/shared.hpp"
 
 namespace roq {
+namespace samples {
 namespace bridge {
 namespace json {
 
@@ -88,4 +89,5 @@ struct Controller final : public io::sys::Signal::Handler,
 
 }  // namespace json
 }  // namespace bridge
+}  // namespace samples
 }  // namespace roq

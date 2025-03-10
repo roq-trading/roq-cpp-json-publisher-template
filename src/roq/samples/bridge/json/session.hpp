@@ -11,9 +11,10 @@
 
 #include "roq/web/rest/server.hpp"
 
-#include "roq/bridge/json/shared.hpp"
+#include "roq/samples/bridge/json/shared.hpp"
 
 namespace roq {
+namespace samples {
 namespace bridge {
 namespace json {
 
@@ -52,6 +53,17 @@ struct Session final : public web::rest::Server::Handler {
 
   void disconnect();
 
+  void send_response(web::rest::Server::Request const &, web::http::Status, std::string_view const &body = {});
+
+  template <typename Callback>
+  bool get_source(Callback, std::string_view const &source, std::string_view const &exchange, std::string_view const &symbol) const;
+
+  template <typename Callback>
+  bool get_source_and_account(
+      Callback, std::string_view const &source, std::string_view const &exchange, std::string_view const &symbol, std::string_view const &account) const;
+
+  // process
+
   void process_request(web::rest::Server::Request const &);
 
   void process_reference_data(
@@ -65,15 +77,6 @@ struct Session final : public web::rest::Server::Handler {
       std::string_view const &symbol,
       std::string_view const &account);
 
-  void send_response(web::rest::Server::Request const &, web::http::Status, std::string_view const &body = {});
-
-  template <typename Callback>
-  bool get_source(Callback, std::string_view const &source, std::string_view const &exchange, std::string_view const &symbol) const;
-
-  template <typename Callback>
-  bool get_source_and_account(
-      Callback, std::string_view const &source, std::string_view const &exchange, std::string_view const &symbol, std::string_view const &account) const;
-
  private:
   Handler &handler_;
   Shared &shared_;
@@ -86,4 +89,5 @@ struct Session final : public web::rest::Server::Handler {
 
 }  // namespace json
 }  // namespace bridge
+}  // namespace samples
 }  // namespace roq

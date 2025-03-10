@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2025, Hans Erik Thrane */
 
-#include "roq/bridge/json/settings.hpp"
+#include "roq/samples/bridge/json/settings.hpp"
 
 #include "roq/logging.hpp"
 
@@ -9,6 +9,7 @@
 using namespace std::literals;
 
 namespace roq {
+namespace samples {
 namespace bridge {
 namespace json {
 
@@ -18,4 +19,5 @@ Settings::Settings(args::Parser const &args) : roq::client::flags::Settings{args
 
 }  // namespace json
 }  // namespace bridge
+}  // namespace samples
 }  // namespace roq

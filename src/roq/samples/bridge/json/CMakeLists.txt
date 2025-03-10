@@ -22,7 +22,6 @@ target_link_libraries(
           roq-client::roq-client
           roq-client::roq-client-flags
           roq-codec::roq-codec
-          roq-fix::roq-fix
           roq-flags::roq-flags
           roq-web::roq-web
           roq-io::roq-io

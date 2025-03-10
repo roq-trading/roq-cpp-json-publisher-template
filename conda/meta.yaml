@@ -1,5 +1,5 @@
 package:
-  name: roq-json-bridge
+  name: roq-cpp-json-bridge-template
   version: {{ GIT_DESCRIBE_TAG }}
 
 source:
@@ -14,11 +14,7 @@ requirements:
     - {{ compiler('cxx') }}
     - clang-format
     - cmake
-    - coreutils                                                                                                                                                    
-    - git
-    - jinja2
     - make
-    - pkg-config
     - roq-autogen
   host:
     - catch2
@@ -29,14 +25,12 @@ requirements:
     - roq-cache
     - roq-client
     - roq-codec
-    - roq-fix
     - roq-flags
     - roq-io
     - roq-logging
     - roq-market
     - roq-oss-benchmark
     - roq-oss-magic_enum
-    - roq-oss-nameof
     - roq-oss-tomlplusplus
     - roq-oss-unordered_dense
     - roq-utils
@@ -46,7 +40,7 @@ about:
   home: https://roq-trading.com
   doc_url: https://roq-trading.com/docs
   dev_url: https://github.com/roq-trading
-  license: BSD-3-Clause
-  license_family: BSD
+  license: MIT
+  license_family: MIT
   license_file: LICENSE
-  summary: Roq JSON Bridge
+  summary: Roq JSON Bridge (a template project)

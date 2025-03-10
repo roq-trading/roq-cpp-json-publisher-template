@@ -7,6 +7,7 @@
 #include "roq/service.hpp"
 
 namespace roq {
+namespace samples {
 namespace bridge {
 namespace json {
 
@@ -19,4 +20,5 @@ struct Application final : public roq::Service {
 
 }  // namespace json
 }  // namespace bridge
+}  // namespace samples
 }  // namespace roq
