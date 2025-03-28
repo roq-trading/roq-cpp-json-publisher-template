@@ -80,7 +80,7 @@ struct Session final : public web::rest::Server::Handler {
  private:
   Handler &handler_;
   Shared &shared_;
-  io::Context &context_;
+  [[maybe_unused]] io::Context &context_;
   uint64_t const session_id_;
   std::unique_ptr<web::rest::Server> const server_;
   std::chrono::nanoseconds last_refresh_ = {};

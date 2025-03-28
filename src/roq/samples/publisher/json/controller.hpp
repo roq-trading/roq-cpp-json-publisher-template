@@ -70,7 +70,6 @@ struct Controller final : public io::sys::Signal::Handler,
   void remove_zombies();
 
  private:
-  Settings const &settings_;
   Shared shared_;
   // io
   io::Context &context_;

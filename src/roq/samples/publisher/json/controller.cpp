@@ -46,7 +46,7 @@ auto create_dispatcher(auto &settings, auto &config, auto &context, auto &connec
 // === IMPLEMENTATION ===
 
 Controller::Controller(Settings const &settings, Config const &config, io::Context &context, std::span<std::string_view const> const &params)
-    : settings_{settings}, shared_{settings}, context_{context}, terminate_{context.create_signal(*this, io::sys::Signal::Type::TERMINATE)},
+    : shared_{settings}, context_{context}, terminate_{context.create_signal(*this, io::sys::Signal::Type::TERMINATE)},
       interrupt_{context.create_signal(*this, io::sys::Signal::Type::INTERRUPT)}, timer_{create_timer(*this, context_)},
       listener_{create_tcp_listener(*this, settings, context_)}, dispatcher_{create_dispatcher(settings, config, context, params)} {
 }

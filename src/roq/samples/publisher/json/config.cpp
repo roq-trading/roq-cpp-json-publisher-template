@@ -17,17 +17,20 @@ Config::Config(Settings const &settings) : settings_{settings} {
 }
 
 void Config::dispatch(Handler &handler) const {
-  handler(client::Account{
-      .regex = ".*"sv,
-  });
-  handler(client::Symbol{
-      .regex = ".*"sv,
-      .exchange = "deribit"sv,
-  });
-  handler(client::Symbol{
-      .regex = ".*"sv,
-      .exchange = {},
-  });
+  handler(
+      client::Account{
+          .regex = ".*"sv,
+      });
+  handler(
+      client::Symbol{
+          .regex = ".*"sv,
+          .exchange = "deribit"sv,
+      });
+  handler(
+      client::Symbol{
+          .regex = ".*"sv,
+          .exchange = {},
+      });
 }
 
 }  // namespace json
