@@ -189,13 +189,15 @@ void Session::disconnect() {
 
 void Session::send_response(web::rest::Server::Request const &request, web::http::Status status, std::string_view const &body) {
   auto connection = [&]() -> web::http::Connection {
-    if (status == web::http::Status::OK && request.headers.connection.has(web::http::Connection::KEEP_ALIVE))
+    if (status == web::http::Status::OK && request.headers.connection.has(web::http::Connection::KEEP_ALIVE)) {
       return web::http::Connection::KEEP_ALIVE;
+    }
     return web::http::Connection::CLOSE;
   }();
   auto content_type = [&]() -> web::http::ContentType {
-    if (std::empty(body))
+    if (std::empty(body)) {
       return {};
+    }
     return web::http::ContentType::APPLICATION_JSON;
   }();
   auto response = web::rest::Server::Response{
@@ -244,8 +246,9 @@ bool Session::get_source_and_account(
 void Session::process_request(web::rest::Server::Request const &request) {
   auto path = request.path;
   log::warn("DBUG path=[{}]"sv, fmt::join(path, ", "sv));
-  if (std::empty(path))
+  if (std::empty(path)) {
     return;
+  }
   enum class Type {
     REFERENCE_DATA,
     TOP_OF_BOOK,
@@ -272,8 +275,9 @@ void Session::process_reference_data(
     web::rest::Server::Request const &request, std::string_view const &source, std::string_view const &exchange, std::string_view const &symbol) {
   auto helper = [&](auto &source, auto id) {
     auto iter = source.reference_data.find(id);
-    if (iter == std::end(source.reference_data))
+    if (iter == std::end(source.reference_data)) {
       return;  // note! not found
+    }
     auto &reference_data = (*iter).second;
     auto body = fmt::format(
         R"({{)"
@@ -291,8 +295,9 @@ void Session::process_top_of_book(
     web::rest::Server::Request const &request, std::string_view const &source, std::string_view const &exchange, std::string_view const &symbol) {
   auto helper = [&](auto &source, auto id) {
     auto iter = source.top_of_book.find(id);
-    if (iter == std::end(source.top_of_book))
+    if (iter == std::end(source.top_of_book)) {
       return;  // note! not found
+    }
     auto &top_of_book = (*iter).second;
     auto body = fmt::format(
         R"({{)"
@@ -315,8 +320,9 @@ void Session::process_position(
     std::string_view const &account) {
   auto helper = [&]([[maybe_unused]] auto &source, auto &account, auto id) {
     auto iter = account.position.find(id);
-    if (iter == std::end(account.position))
+    if (iter == std::end(account.position)) {
       return;  // not found
+    }
     auto &position = (*iter).second;
     auto body = fmt::format(
         R"({{)"

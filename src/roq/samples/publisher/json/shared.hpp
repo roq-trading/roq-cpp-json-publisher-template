@@ -55,11 +55,13 @@ struct Shared final {
     template <typename Callback>
     bool get_id(Callback callback, std::string_view const &exchange, std::string_view const &symbol) {
       auto iter_1 = lookup_.find(exchange);
-      if (iter_1 == std::end(lookup_))
+      if (iter_1 == std::end(lookup_)) {
         return false;
+      }
       auto iter_2 = (*iter_1).second.find(symbol);
-      if (iter_2 == std::end((*iter_1).second))
+      if (iter_2 == std::end((*iter_1).second)) {
         return false;
+      }
       callback((*iter_2).second);
       return true;
     }
@@ -67,8 +69,9 @@ struct Shared final {
     template <typename Callback>
     bool get_account(Callback callback, std::string_view const &account) {
       auto iter = accounts_.find(account);
-      if (iter == std::end(accounts_))
+      if (iter == std::end(accounts_)) {
         return false;
+      }
       callback((*iter).second);
       return true;
     }
@@ -88,11 +91,13 @@ struct Shared final {
   template <typename Callback>
   bool get_source(Callback callback, std::string_view const &source) {
     auto iter_1 = lookup_.find(source);
-    if (iter_1 == std::end(lookup_))
+    if (iter_1 == std::end(lookup_)) {
       return false;
+    }
     auto iter_2 = sources_.find((*iter_1).second);
-    if (iter_2 == std::end(sources_))
+    if (iter_2 == std::end(sources_)) {
       return false;
+    }
     callback((*iter_2).second);
     return true;
   }

@@ -68,8 +68,9 @@ void Controller::dispatch() {
     // drain i/o
     context_.drain();
     // drain shared memory
-    for (size_t i = 0; i < DISPATCH_THIS_MANY_BEFORE_CHECKING_CLOCK; ++i)
+    for (size_t i = 0; i < DISPATCH_THIS_MANY_BEFORE_CHECKING_CLOCK; ++i) {
       ok &= (*dispatcher_).dispatch(*this);
+    }
   }
 }
 
@@ -85,8 +86,9 @@ void Controller::operator()(io::sys::Signal::Event const &event) {
 void Controller::operator()(io::sys::Timer::Event const &event) {
   auto now = event.now;
   if (next_heartbeat_ < now) {
-    for (auto &[_, session] : sessions_)
+    for (auto &[_, session] : sessions_) {
       (*session).ping(now);
+    }
     next_heartbeat_ = now + HEARTBEAT_FREQUENCY;
   }
   if (next_cleanup_ < now) {
@@ -147,10 +149,12 @@ void Controller::create_session(io::net::tcp::Connection::Factory &factory, uint
 
 void Controller::remove_zombies() {
   auto count = std::size(zombies_);
-  if (count == 0)
+  if (count == 0) {
     return;
-  for (auto session_id : zombies_)
+  }
+  for (auto session_id : zombies_) {
     sessions_.erase(session_id);
+  }
   zombies_.clear();
   log::info("Removed {} zombied session(s) (remaining: {})"sv, count, std::size(sessions_));
 }
