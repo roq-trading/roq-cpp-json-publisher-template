@@ -104,11 +104,11 @@ struct Shared final {
 
   template <typename T>
   void operator()(Event<T> const &event) {
-    using value_type = std::remove_cvref<T>::type;
+    using value_type = std::remove_cvref_t<T>;
     auto &[message_info, value] = event;
-    if constexpr (std::is_same<value_type, Connected>::value) {
+    if constexpr (std::is_same_v<value_type, Connected>) {
       create_source(message_info.source, message_info.source_name);
-    } else if constexpr (std::is_same<value_type, Disconnected>::value) {
+    } else if constexpr (std::is_same_v<value_type, Disconnected>) {
       remove_source(message_info.source, message_info.source_name);
     } else {
       auto &source = get_source(message_info.source);
