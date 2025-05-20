@@ -113,7 +113,7 @@ struct Shared final {
     } else {
       auto &source = get_source(message_info.source);
       auto id = get_id(source, value.exchange, value.symbol);
-      constexpr bool has_account = requires(T const &t) { t.account; };
+      constexpr bool has_account = requires(T const &type) { type.account; };
       if constexpr (has_account) {
         auto &account = get_account(source, value.account);
         account(event, id);
